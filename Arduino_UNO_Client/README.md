@@ -3,6 +3,8 @@ A project on **[Collaborizm](https://www.collaborizm.com/)** to download and use
 
 Read more at the repo root **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/README.md).**
 
+&nbsp;
+
 ## **Arduino UNO Client**
 Sends GET request to Local Server and displays event data on the LCD at regular intervals. Uses WDT to reset when memory decreases.
 
@@ -18,7 +20,8 @@ WiFiEsp
 
 ## **Circuit diagram**
 Was designed at **[circuits.io](https://circuits.io/circuits/3389638-arduino-esp-01-wifi-lcd)**   
-Will be added soon.
+
+![Circuit Diagram](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Arduino_UNO_Client/Circuit%20Diagram.png "Circuit Diagram")
 
 &nbsp;
 

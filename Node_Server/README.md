@@ -3,8 +3,9 @@ A project on **[Collaborizm](https://www.collaborizm.com/)** to download and use
 
 Read more at the repo root **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/README.md)**.
 
+&nbsp;
 
-##  **Node.js Server (PC or RPi)**
+## **Node.js Server (PC or RPi)**
 Downloads data from Mixpanel server and saves it in the Local Database at regular intervals.
 
 &nbsp;
@@ -42,14 +43,19 @@ Sign up and use API keys for Mixpanel and MongoDB (if not using local DB).
 ### 4. Local Server
 File: ``webserver.js``   
 Configure port and other web server related stuff, including REST API paths.  
+Default port is ``8970``, subject to change.
 
 &nbsp;
 
 ## **REST API**
-### 1.  ``/``  
+### 1. ``http://server_ip:8970``
+REST API Server. Default port is ``8970``, subject to change.   
+Watch ``node console`` to catch it.
+
+### 2.  ``/``  
 Status check.
 
-### 2.  ``/events?``   
+### 3.  ``/events?``   
 JSON array of all events judged by following parameters.   
 **Parameters:**
 ```
@@ -60,7 +66,7 @@ to: unix timestamp (ms) end
 last: latest event only (single), can be combined with above params. Supply with dummy value.
 ```   
 
-### 3.  ``/events/arduino``    
+### 4.  ``/events/arduino``    
 Formatted string for Arduino. Hack to get around low memory problems.   
 **Output:** {No spaces in outside < > pairs}   
 ```
@@ -68,7 +74,7 @@ Formatted string for Arduino. Hack to get around low memory problems.
 ASCII(30)\n <line 1 text>\n <line 2 text>\n ASCII(31)    
 ```
 
-### 4.  ``/time``    
+### 5.  ``/time``    
 Server time. Used to set time for RTCs in client devices.   
 **Output:**   
 ```

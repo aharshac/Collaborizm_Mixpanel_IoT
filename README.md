@@ -1,11 +1,13 @@
 # **Collaborizm Mixpanel IoT Project**
 A project on **[Collaborizm](https://www.collaborizm.com/)** to download and use Mixpanel Event data on IoT devices.
 
+&nbsp;
+
 ## **Supported devices**
-* Arduino UNO: Client.  **[README]()**
+* Arduino UNO: Client.  **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/Arduino_UNO_Client/README.md)**
 * Arduino Mega 2560: Client (ongoing)
 * NodeMCU: Client (ongoing)
-* PC or Raspberry Pi: Server (ongoing)  **[README]()**
+* PC or Raspberry Pi: Server (ongoing)  **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/Node_Server/README.md)**
 
 Until Server is ported to Raspberry Pi, run Node_Server package on PC, with the clients on the same WiFi as the PC.
 
@@ -17,6 +19,8 @@ Downloads data from Mixpanel server and saves it in the Local Database at regula
 
 ### 2. Arduino UNO Client
 Sends GET request to Local Server and displays event data on the LCD at regular intervals. Uses WDT to reset when memory decreases.
+
+<img src="https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Arduino_UNO_Client/Circuit%20Diagram.png" width="437" height="246" />
 
 &nbsp;
 
@@ -49,10 +53,14 @@ db.eventSchema = new Schema({
 ```
 
 ### 4. **REST API**
-#### 1.  ``/``  
+#### 1. ``http://server_ip:8970``
+REST API Server. Default port is ``8970``, subject to change.   
+Watch ``node console`` to catch it.
+
+#### 2.  ``/``  
 Status check.
 
-#### 2.  ``/events?``   
+#### 3.  ``/events?``   
 JSON array of all events judged by following parameters.   
 **Parameters:**
 ```
@@ -63,7 +71,7 @@ to: unix timestamp (ms) end
 last: latest event only (single), can be combined with above params. Supply with dummy value.
 ```   
 
-#### 3.  ``/events/arduino``    
+#### 4.  ``/events/arduino``    
 Formatted string for Arduino. Hack to get around low memory problems.   
 **Output:** {No spaces in outside < > pairs}   
 ```
@@ -71,7 +79,7 @@ Formatted string for Arduino. Hack to get around low memory problems.
 ASCII(30)\n <line 1 text>\n <line 2 text>\n ASCII(31)    
 ```
 
-#### 4.  ``/time``    
+#### 5.  ``/time``    
 Server time. Used to set time for RTCs in client devices.   
 **Output:**   
 ```
