@@ -1,30 +1,17 @@
 # **Collaborizm Mixpanel IoT Project**
-A project on **[Collaborizm](https://www.collaborizm.com/)** to download and use Mixpanel Event data on IoT devices.
+A project on **[Collaborizm](https://www.collaborizm.com/)** to download and use Mixpanel Event data on IoT devices.   
 
-## **Supported devices**
-* Arduino UNO: Client.  **[README]()**
-* Arduino Mega 2560: Client (ongoing)
-* NodeMCU: Client (ongoing)
-* PC or Raspberry Pi: Server (ongoing)  **[README]()**
+Read more at the repo root **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/README.md)**.
 
-Until Server is ported to Raspberry Pi, run Node_Server package on PC, with the clients on the same WiFi as the PC.
 
-&nbsp;
-
-## **Network Nodes**
-### 1. Node.js Server (PC or RPi)
+##  **Node.js Server (PC or RPi)**
 Downloads data from Mixpanel server and saves it in the Local Database at regular intervals.
 
-### 2. Arduino UNO Client
-Sends GET request to Local Server and displays event data on the LCD at regular intervals. Uses WDT to reset when memory decreases.
-
 &nbsp;
 
-## **Important Stuff**
-### 1. **README** is meant to be read.
-
-### 2. **Mixpanel Event Schema**
-File: ``Node_Server\mixpanel.js``  
+## **Configuration**
+### 1. Mixpanel Event Schema
+File: ``mixpanel.js``  
 Data sent to Mixpanel by Collaborizm server (and this node, for test purposes).
 ```
 mp.track("Reply", {
@@ -35,8 +22,8 @@ mp.track("Reply", {
 });
 ```
 
-### 3. **Local Database Schema**
-File: ``Node_Server\db.js``  
+### 2. Local Database Schema
+File: ``db.js``  
 How our Local Database stores data imported from Mixpanel.
 ```
 db.eventSchema = new Schema({
@@ -48,11 +35,21 @@ db.eventSchema = new Schema({
 });
 ```
 
-### 4. **REST API**
-#### 1.  ``/``  
+### 3. API Keys
+File: ``config.js``   
+Sign up and use API keys for Mixpanel and MongoDB (if not using local DB).
+
+### 4. Local Server
+File: ``webserver.js``   
+Configure port and other web server related stuff, including REST API paths.  
+
+&nbsp;
+
+## **REST API**
+### 1.  ``/``  
 Status check.
 
-#### 2.  ``/events?``   
+### 2.  ``/events?``   
 JSON array of all events judged by following parameters.   
 **Parameters:**
 ```
@@ -63,7 +60,7 @@ to: unix timestamp (ms) end
 last: latest event only (single), can be combined with above params. Supply with dummy value.
 ```   
 
-#### 3.  ``/events/arduino``    
+### 3.  ``/events/arduino``    
 Formatted string for Arduino. Hack to get around low memory problems.   
 **Output:** {No spaces in outside < > pairs}   
 ```
@@ -71,9 +68,22 @@ Formatted string for Arduino. Hack to get around low memory problems.
 ASCII(30)\n <line 1 text>\n <line 2 text>\n ASCII(31)    
 ```
 
-#### 4.  ``/time``    
+### 4.  ``/time``    
 Server time. Used to set time for RTCs in client devices.   
 **Output:**   
 ```
 Human readable date and time. Not ISO 8601 time.
 ```
+
+&nbsp;
+
+## **Build Instructions**
+1. Install [Node.js](https://nodejs.org/)
+2. Get API keys from Mixpanel and MongoLab.
+3. Open Command Prompt or Terminal console.
+4. ``cd`` to this directory.
+5. ``npm install -g nodemon``
+6. ``npm install``
+7. ``npm run dev``
+8. Note down Local IP address displayed in the console.
+9. To exit, press ``Ctrl + C`` and `y` in the console. Else, `nodemon` will crash.
