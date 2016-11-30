@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+.DS_Store
+
+.persist/
+
+*.zip
+*.crx
+*.pem
+update.xml
+.idea/
+output.txt
+#config.js
+config1.js
