@@ -49,7 +49,7 @@ Configure port and other web server related stuff.
 **2.4.1.1**  ``/``  
 Status check.
 
-**2.4.1.2**  ``/events?``
+**2.4.1.2**  ``/events?``   
 JSON array of all events judged by following parameters.
 ```
 Parameters:
@@ -61,14 +61,14 @@ to: unix timestamp (ms) end
 last: latest event only (single), can be combined with above params. Supply with dummy value.
 ```
 
-**2.4.1.3**  ``/events/arduino``
+**2.4.1.3**  ``/events/arduino``    
 Formatted string for Arduino. Hack to get around low memory problems.
 ```
 No spaces in between.
 Output: Char(30)\n <line 1 text>\n <line 2 text>\n Char(31)    
 ```
 
-**2.4.1.4**  ``/time``
+**2.4.1.4**  ``/time``    
 Server time. Used to set time for RTCs in client devices.
 ```
 Output: Human readable date and time. Not ISO 8601 time.

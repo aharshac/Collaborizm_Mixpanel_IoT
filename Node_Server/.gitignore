@@ -10,5 +10,6 @@ npm-debug.log
 update.xml
 .idea/
 output.txt
-#config.js
+config0.js
+config.js
 config1.js
