@@ -72,11 +72,11 @@ last: latest event only (single), can be combined with above params. Supply with
 ```   
 
 #### 4.  ``/events/arduino``    
-Formatted string for Arduino. Hack to get around low memory problems.   
-**Output:** {No spaces in outside < > pairs}   
+JSON Object containing line data. Directly displayed on Arduino without processing.  
+_Deprecated:_ ~~Formatted string for Arduino. Hack to get around low memory problems.~~   
+**Output:**  
 ```
-
-ASCII(30)\n <line 1 text>\n <line 2 text>\n ASCII(31)    
+{"0": "<line 0 text>", "1": "<line 1 text>"}    
 ```
 
 #### 5.  ``/time``    

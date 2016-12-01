@@ -134,14 +134,9 @@ server.app.get('/events', (req, res) => {
 });
 
 
-// API: /events/arduino
-/*
-	Arduino/Esp8266 lacks juice. Unless we can dope it with viagra, json parsing takes time and resources.
-	Configure required LCD output here itself.
-	Output: Char(30)\n <line 1 text>\n <line 2 text>\n Char(31)  
-	Deprecated: Output each line to be displayed on arduino as @OP::<line 1 content goes here>;<line 2 content goes here>\n.
-*/
-
+// 	API: /events/arduino
+//	Using formatted string looks like a bad idea
+//	So Json after all
 server.app.get('/events/arduino', (req, res) => {
 	var projection = 'name city country date timestamp';	// columns. col timestamp is required for sorting
 	var selection = mixpanel.required_events;			//	event name filter
@@ -156,6 +151,7 @@ server.app.get('/events/arduino', (req, res) => {
 	find.sort({'timestamp': -1});
 	find.limit(1);
 
+	var op = {};
 
 	find.exec(function(err, events) {
 		if (err){
@@ -163,8 +159,6 @@ server.app.get('/events/arduino', (req, res) => {
 			console.log("REST API Query Error @ " + config.getLogTime() + ": " + err);
 		}else{
 			if(events.length == 1){
-				var op = "";
-
 				var event = events[0];
 
 				var name = event.name;
@@ -172,27 +166,23 @@ server.app.get('/events/arduino', (req, res) => {
 				var country = event.country;
 				var timestamp = event.timestamp;
 
-				// fucking timezone problem. date pushed to mixpanel as ISO 8601 with added timezone offset
-				// fixed problem by using timestamp instead of date
-				// subtract 5.5 hours until fixed
 				if(moment(timestamp).isValid()){
-					date = moment(timestamp).format("HH:mm");			// need only the time, for now (1602 lcd)
-					//date = moment(date).subtract(5.5, 'hours').format("H:mm");			// DONE:: TODO: fix mixpanel ISO 8601 string spec
+					date = moment(timestamp).format("HH:mm");
 				}
 
-				op = String.fromCharCode(30) + "\n";	//Content start: ASCII code for record separator
-				op += name + ", " + date + "\n";
-				op += city + ", " + country + "\n";
-				op += String.fromCharCode(31);	// ASCII code for unit separator
-				res.send(op);
+				op = {
+					"0" : name + ", " + date,
+					"1"	: city + ", " + country
+				};
+
+				res.send(String.fromCharCode(30) + JSON.stringify(op));	//Content start: ASCII code for record separator
 			}else{
-				res.send("");
+				res.send("");	// empty
 			}
-			console.log("REST API Query @ " + config.getLogTime() + ": Events/Arduino\n" + op + "\n");
+			console.log("REST API Query @ " + config.getLogTime() + ": Events/Arduino/Json\n" + JSON.stringify(op) + "\n");
 		}
 	});
 });
-
 
 // Not ISO 8601 time. Human readable.
 server.app.get('/time', (req, res) => {
@@ -239,9 +229,5 @@ server.app.get('/stop', (req, res) => {
 		process.exit();
 	}, 1000);
 });
-
-
-
-
 
 module.exports = server;

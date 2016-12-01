@@ -13,13 +13,14 @@ Sends GET request to Local Server and displays event data on the LCD at regular 
 ESP-01 WiFi Module  
 
 ### Libraries:
-StringSplitter  
+ArduinoJson   
+~~StringSplitter~~   
 WiFiEsp
 
 &nbsp;
 
 ## **Circuit diagram**
-Was designed at **[circuits.io](https://circuits.io/circuits/3389638-arduino-esp-01-wifi-lcd)**   
+Designed at **[circuits.io](https://circuits.io/circuits/3389638-arduino-esp-01-wifi-lcd)**   
 
 ![Circuit Diagram](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Arduino_UNO_Client/Circuit%20Diagram.png "Circuit Diagram")
 
