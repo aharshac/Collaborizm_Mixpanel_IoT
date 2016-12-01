@@ -74,7 +74,7 @@ last: latest event only (single), can be combined with above params. Supply with
 #### 4.  ``/events/arduino``    
 JSON Object containing line data. Directly displayed on Arduino without processing.  
 _Deprecated:_ ~~Formatted string for Arduino. Hack to get around low memory problems.~~   
-**Output:**  
+**Output:**  The character (ASCII 30) prepended to the JSON string is used to determine the start of content.  
 ```
 {"0": "<line 0 text>", "1": "<line 1 text>"}    
 ```
