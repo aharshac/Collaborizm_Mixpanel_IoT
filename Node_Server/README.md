@@ -11,28 +11,34 @@ Downloads data from Mixpanel server and saves it in the Local Database at regula
 &nbsp;
 
 ## **Configuration**
-### 1. Mixpanel Event Schema
-File: ``mixpanel.js``  
-Data sent to Mixpanel by Collaborizm server (and this node, for test purposes).
+### 1. **Mixpanel Event Schema (Example)**
+File: ``mixpanel.js (line 19)``  
+Data sent to Mixpanel by Collaborizm server (and this node, for testing purposes).   
+
+**Important:** Add property ``timestamp`` to your Mixpanel event, with the value ``UNIX timestamp (ms)``.   
+Mixpanel REST API does not have required constraints to fetch distinct data. So we need this. **PERIOD**
 ```
 mp.track("Reply", {
   city: "Mangalore",
   country: 'India',
   date: moment(Date.now()).format(),	// Human readable date
-  timestamp: moment(Date.now()).valueOf()	// unix timestamp in ms
+  timestamp: moment(Date.now()).valueOf()	// (important) unix timestamp in ms
 });
 ```
 
-### 2. Local Database Schema
-File: ``db.js``  
-How our Local Database stores data imported from Mixpanel.
+### 2. **Local Database Schema**
+File: ``db.js (line 43)``  
+How our Local Database stores data imported from Mixpanel.    
+
+**Important:** Do not remove ``timestamp``.   
+Mixpanel REST API does not have required constraints to fetch distinct data. So whatever you do, just don't touch it. **PERIOD**
 ```
 db.eventSchema = new Schema({
   name: {type: String, required: true}, // event name
   city: {type: String, required: true},
   country: {type: String, required: true},
   date: {type: Date, default: moment(Date.now()).format()}, // human readable date, ISO 8601
-  timestamp: {type: Number, default: moment(Date.now()).valueOf()}	// unix timestamp in ms
+  timestamp: {type: Number, default: moment(Date.now()).valueOf()}	// (important) unix timestamp in ms
 });
 ```
 
@@ -69,7 +75,7 @@ last: latest event only (single), can be combined with above params. Supply with
 ### 4.  ``/events/arduino``    
 JSON Object containing line data. Directly displayed on Arduino without processing.  
 _Deprecated:_ ~~Formatted string for Arduino. Hack to get around low memory problems.~~   
-**Output:**  The character (ASCII 30) prepended to the JSON string is used to determine the start of content. 
+**Output:**  The character (ASCII 30) prepended to the JSON string is used to determine the start of content.
 ```
 {"0": "<line 0 text>", "1": "<line 1 text>"}    
 ```

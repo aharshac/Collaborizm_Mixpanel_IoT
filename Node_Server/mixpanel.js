@@ -12,7 +12,7 @@ const mixpanel = {};
 
 mixpanel.mp = mp_prototype.init(config.mp_auth_token);
 
-
+// Events that we want to track and/or download from Mixpanel.
 mixpanel.required_events = ["Reply"];
 
 

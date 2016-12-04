@@ -27,28 +27,34 @@ Sends GET request to Local Server and displays event data on the LCD at regular 
 ## **Important Stuff**
 ### 1. **README** is meant to be read.
 
-### 2. **Mixpanel Event Schema**
-File: ``Node_Server\mixpanel.js``  
-Data sent to Mixpanel by Collaborizm server (and this node, for test purposes).
+### 2. **Mixpanel Event Schema (Example)**
+File: ``Node_Server\mixpanel.js (line 19)``  
+Data sent to Mixpanel by Collaborizm server (and this node, for testing purposes).   
+
+**Important:** Add property ``timestamp`` to your Mixpanel event, with the value ``UNIX timestamp (ms)``.   
+Mixpanel REST API does not have required constraints to fetch distinct data. So we need this. **PERIOD**
 ```
 mp.track("Reply", {
   city: "Mangalore",
   country: 'India',
   date: moment(Date.now()).format(),	// Human readable date
-  timestamp: moment(Date.now()).valueOf()	// unix timestamp in ms
+  timestamp: moment(Date.now()).valueOf()	// (important) unix timestamp in ms
 });
 ```
 
 ### 3. **Local Database Schema**
-File: ``Node_Server\db.js``  
-How our Local Database stores data imported from Mixpanel.
+File: ``Node_Server\db.js (line 43)``  
+How our Local Database stores data imported from Mixpanel.    
+    
+**Important:** Do not remove ``timestamp``.   
+Mixpanel REST API does not have required constraints to fetch distinct data. So whatever you do, just don't touch it. **PERIOD**
 ```
 db.eventSchema = new Schema({
   name: {type: String, required: true}, // event name
   city: {type: String, required: true},
   country: {type: String, required: true},
   date: {type: Date, default: moment(Date.now()).format()}, // human readable date, ISO 8601
-  timestamp: {type: Number, default: moment(Date.now()).valueOf()}	// unix timestamp in ms
+  timestamp: {type: Number, default: moment(Date.now()).valueOf()}	// (important) unix timestamp in ms
 });
 ```
 
