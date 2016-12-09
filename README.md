@@ -6,8 +6,8 @@ A project on **[Collaborizm](https://www.collaborizm.com/)** to download and use
 ## **Supported devices**
 * Arduino UNO: Client.  **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/Arduino_UNO_Client/README.md)**
 * Arduino Mega 2560: Client (ongoing)
-* NodeMCU: Client (ongoing)
-* PC or Raspberry Pi: Server (ongoing)  **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/Node_Server/README.md)**
+* NodeMCU DEVKIT V3: Client **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/NodeMCU_Client/README.md)**
+* PC or Raspberry Pi: Server  **[README](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/blob/master/Node_Server/README.md)**
 
 Until Server is ported to Raspberry Pi, run Node_Server package on PC, with the clients on the same WiFi as the PC.
 
@@ -21,6 +21,11 @@ Downloads data from Mixpanel server and saves it in the Local Database at regula
 Sends GET request to Local Server and displays event data on the LCD at regular intervals. Uses WDT to reset when memory decreases.
 
 <img src="https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Arduino_UNO_Client/Circuit%20Diagram.png" width="437" height="246" />
+
+### 3. NodeMCU DEVKIT V3 Client
+Sends GET request to Local Server and displays event data on the LCD at regular intervals.
+
+The Chinese V3 clones are a bit larger than the regular V2 boards. But one reserved pin is connected to USB +5V and another to GND in these clones.
 
 &nbsp;
 
@@ -45,7 +50,7 @@ mp.track("Reply", {
 ### 3. **Local Database Schema**
 File: ``Node_Server\db.js (line 43)``  
 How our Local Database stores data imported from Mixpanel.    
-    
+
 **Important:** Do not remove ``timestamp``.   
 Mixpanel REST API does not have required constraints to fetch distinct data. So whatever you do, just don't touch it. **PERIOD**
 ```

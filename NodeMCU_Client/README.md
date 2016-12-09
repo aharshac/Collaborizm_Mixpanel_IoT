@@ -10,7 +10,7 @@ Read more at [NodeMCU Wikipedia Page](https://en.wikipedia.org/wiki/NodeMCU)
 
 Sends GET request to Local Server and displays event data on the LCD at regular intervals.
 
-The Chinese clone is a bit larger than the regular V2 board. But one reserved pin is connected to USB +5V and another to GND in these clones.  
+The Chinese V3 clones are a bit larger than the regular V2 board. But one reserved pin is connected to USB +5V and another to GND in these clones.  
 Read comparison [here](http://frightanic.com/iot/comparison-of-esp8266-nodemcu-development-boards/)
 
 ### Shields:
