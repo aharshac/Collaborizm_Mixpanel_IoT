@@ -29,8 +29,10 @@ mixpanel.trackStart = function(){
 
 
 // 	Get Mixpanel API end point url
-//	events: Array of strings ["1", "a", "b"] etc; 	deprecated: formatted string '["compile"]'
 // 	Mixpanel date format: YYYY-MM-DD
+//	events: Array of strings ["1", "a", "b"] etc; 	deprecated: formatted string '["compile"]'
+//	propTimestamp: name of property used to store unix timestamp (ms) in Mixpanel
+//	timestamp: unix timestamp. Uniqueness check. Only events with timestamps above this will be downloaded.
 mixpanel.getMpRequestUrl = function(events, propTimestamp, timestamp){
 	var selection = "[";
 	if (events){
@@ -60,8 +62,8 @@ mixpanel.getMpRequestUrl = function(events, propTimestamp, timestamp){
 };
 
 
-// Get export data from Mixpanel
-// latest_only: imports only last tracked event in mixpanel, if true
+// 	Get export data from Mixpanel
+// 	latest_only: imports only last tracked event in mixpanel, if true
 mixpanel.getMpData = function(latest_only){
 	console.log('*** Importer Cron @ ' + config.getLogTime());
 

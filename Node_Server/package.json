@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Example of using Mixpanel analytics data on IoT devices. Node app and Local Webserver for other IoT devices. Made for Collaborizm Mixpanel IoT project.",
   "main": "index.js",
-  "repository": { 
-	"type" : "git",
-	"url" : "https://github.com/aharshac/Collaborizm_Mixpanel_IoT.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aharshac/Collaborizm_Mixpanel_IoT.git"
   },
   "scripts": {
     "test": "hi",
@@ -25,6 +25,7 @@
     "mongoose": "^4.6.8",
     "node-cron": "^1.1.2",
     "node-persist": "^2.0.7",
+    "nodemon": "^1.11.0",
     "npm": "^4.0.2",
     "request": "^2.79.0"
   },

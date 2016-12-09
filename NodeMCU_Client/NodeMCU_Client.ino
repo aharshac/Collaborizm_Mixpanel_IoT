@@ -1,20 +1,19 @@
 /*
-  Sketch: Arduino_UNO_Client
-  Description: Arduino UNO Client for Collaborizm Mixpanel IoT project.
+  Sketch: NodeMCU_Client
+  Description: NodeMCU Client for Collaborizm Mixpanel IoT project.
   Version: 1.0
   Author: Harsha Alva
 
-  This sketch shows how to use and display Mixpanel data on a LCD using an Arduino.
+  This sketch shows how to use and display Mixpanel data on a LCD using a NodeMCU.
   Please watch the Serial Monitor for debug info.
 
   For more details see: https://github.com/aharshac/Collaborizm_Mixpanel_IoT
 */
 
-#include <avr/wdt.h>  // For WDT reset
+#include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
-#include <LiquidCrystal.h>
-#include <SoftwareSerial.h>
-#include <WiFiEsp.h>
+#include <Wire.h>  // For I2C
+#include <LiquidCrystal_I2C.h>  // For I2C LCD add-on control
 
 
 const int FREE_RAM_THRESHOLD = 300; //  Reset board if RAM is below this amount
@@ -28,21 +27,6 @@ const unsigned long DELAY_ERR_LONG = 10000L; // Time to wait after bigger errors
 //  Data format helpers
 const char CHR_CONTENT_START = char(30);    //  Server output end. ASCII code for record separator
 //const char CHR_CONTENT_END = char(31);  //  Server output start.  ASCII code for unit separator
-
-//  Pin config
-const int pinEspRx = 2;  //  Esp Rx <----> Arduino Tx
-const int pinEspTx = 3;  //  Esp Tx <----> Arduino Rx
-const int pinLcdRs = 15;  //  LCD RS
-const int pinLcdE = 14;   //  LCD E
-const int pinLcdD0 = 4;  //  LCD D0
-const int pinLcdD1 = 5;  //  LCD D1
-const int pinLcdD2 = 6;  //  LCD D2
-const int pinLcdD3 = 7;  //  LCD D3
-const int pinLcdD4 = 8;  //  LCD D4
-const int pinLcdD5 = 9;  //  LCD D5
-const int pinLcdD6 = 10;  //  LCD D6
-const int pinLcdD7 = 11;  //  LCD D7
-
 
 const unsigned long HTTP_TIMEOUT = 3000;  // max respone time from server
 const size_t MAX_CONTENT_SIZE = 512;       // max size of the HTTP response
@@ -58,58 +42,55 @@ char gWiFiPass[] = ""; // Wifi password
 #error "Change ASAP"
 char gServerName[] = "192.168.1.2";
 const int gServerPort = 8970;
-String gServerRestPath = "/events/arduino";  // Arduino formatted OP
+String gServerRestPath = "/events/arduino";  // Arduino/NodeMCU formatted OP
 
 
 int gRunCount = 0;   // Run counter
 
 
 /***  Expansions and shields ***/
-SoftwareSerial ESP8266(pinEspTx, pinEspRx);   // ESP8266 Wifi Module
-//LiquidCrystal LCD(pinLcdRs, pinLcdE, pinLcdD4, pinLcdD5, pinLcdD6, pinLcdD7); // Init serial
-LiquidCrystal LCD(pinLcdRs, pinLcdE, pinLcdD0, pinLcdD1, pinLcdD2, pinLcdD3, pinLcdD4, pinLcdD5, pinLcdD6, pinLcdD7); // Init parallel
+LiquidCrystal_I2C LCD(0x27, 16, 2);  // I2C address for pins A4 (SDA), A5 (SCL); Set 16x2 LCD.
 
 
 /*** Web Client ***/
-WiFiEspClient WebClient;
+WiFiClient WebClient;
 
 void setup() {
-  wdtResetDisable();  // Disable WDT ASAP
 
   /*** Initialize Shields ***/
-  Serial.begin(9600); // Initialize UART serial for debugging
+  LCD.init();
+  LCD.clear();
+  LCD.backlight();
+
+  WiFi.disconnect();
+  WiFi.mode(WIFI_STA);  // Station Mode
+  WiFi.persistent(false); // Don't save auth
+
+  Serial.begin(115200); // Initialize UART serial for debugging
+
   checkMemState();
-  ESP8266.begin(9600);  // Initialize Software UART serial for ESP module
-  LCD.begin(16,2);  //  Initialize 16x2 LCD
-  lcdOutF2(F("Collaborizm"), F("Arduino-Mixpanel"));
+  serialOutF(F("Collaborizm Mixpanel IoT Project"));
+  lcdOutF2(F("Collaborizm"), F("Mixpanel IoT"));
+  delay(DELAY_WAIT * 2);  //
   /*** End Initialize Shields ***/
-
-
-  /*** Detect and Start ESP-01 ***/
-  WiFi.init(&ESP8266); // initialize ESP module
-  checkMemState();
-  if (WiFi.status() == WL_NO_SHIELD) {  // Check for the presence of the ESP
-    serialOutF(F("ESP WiFi shield not present"));
-    lcdOutF2(F("Error"), F("ESP-01 not found"));
-    while (true); // Loiter here forever until human resets this device
-  }
-  /*** End Detect and Start ESP-01 ***/
 
 
   /*** Connect to WiFi network ***/
   checkMemState();
+  serialOutF1(F("Attempting to connect to WPA SSID"), gWiFiSsid);
   lcdOutF1(F("WiFi CXN INIT"), String(gWiFiSsid));
-  int wifiStatus = WL_IDLE_STATUS;
-  while (wifiStatus != WL_CONNECTED) {     // Repeat till connected to WiFi network
-    serialOutF1(F("Attempting to connect to WPA SSID"), gWiFiSsid);
+  delay(DELAY_WAIT * 1);  //
 
-    wifiStatus = WiFi.begin(gWiFiSsid, gWiFiPass);  // Connect to WPA/WPA2 network
+  boolean backlight = false; // Remeber old state to Toggle backlight while connecting
 
-    if(wifiStatus != WL_CONNECTED){
-      lcdOutF2(F("WiFi"), F("CXN failed"));
-      delay(DELAY_ERR);
-    }
+  WiFi.begin(gWiFiSsid, gWiFiPass);
+  while (WiFi.status() != WL_CONNECTED) {     // Repeat till connected to WiFi network
+      LCD.setBacklight(backlight);  // Toggle backlight while connecting
+      backlight = !backlight;
+      serialOutF(F("."));
+      delay(DELAY_WAIT * 2);
   }
+  LCD.backlight();  // Finally keep backlight on
   /*** End connect to WiFi network ***/
 
 
@@ -128,14 +109,13 @@ void loop(){
 
 void fetchAndDisplayData() {
   /*** Startup  ***/
-  wdtResetDisable();
   serialOutF(F("*** Loop Start ***"));
   /*** End Startup  ***/
 
 
   /*** Connect to server ***/
   checkMemState();
-  wdtResetIfWaitShort();
+
   // Send GET REQUEST
   if (WebClient.connect(gServerName, gServerPort)) {
     WebClient.println("GET " + gServerRestPath + " HTTP/1.1");
@@ -149,7 +129,7 @@ void fetchAndDisplayData() {
     return;
   }
 
-  wdtResetDisable();
+
   serialOutF(F("Connected to Local Server"));
   lcdOutF2(F("Local Server"), F("CXN Success"));
   /*** End Connect to server ***/
@@ -157,7 +137,6 @@ void fetchAndDisplayData() {
 
   /*** Data Integrity check ***/
   checkMemState();
-  wdtResetIfWaitShort();
 
   WebClient.setTimeout(HTTP_TIMEOUT);
   bool ok = WebClient.find(CHR_CONTENT_START);
@@ -168,13 +147,11 @@ void fetchAndDisplayData() {
     return;
   }
 
-  wdtResetDisable();
   /*** End Data Integrity check ***/
 
 
   /*** Start Data parse ***/
   checkMemState();
-  wdtResetIfWaitShort();
 
   char response[MAX_CONTENT_SIZE];
   size_t length = WebClient.readBytes(response, sizeof(response));
@@ -186,9 +163,10 @@ void fetchAndDisplayData() {
   JsonObject& root = jsonBuffer.parseObject(response);
 
   if (root.success()){
-    char *line0 = root["0"];
-    char *line1 = root["1"];
-    lcdOut(line0, line1);
+    const char *line0 = root["0"];
+    const char *line1 = root["1"];
+
+    lcdOutMpEvent(line0, line1);
     serialOutMpEvent(line0, line1);
   }else{
     serialOutF(F("Could not split Local Server data. Retrying..."));
@@ -197,7 +175,6 @@ void fetchAndDisplayData() {
     return;
   }
 
-  wdtResetDisable();
   checkMemState();
   /*** End Data parse ***/
 
@@ -219,7 +196,6 @@ void closeWebClient(){
 }
 
 void windUpOnError(){
-  wdtResetDisable();
   closeWebClient();
   delay(DELAY_ERR_LONG);
 }
@@ -250,7 +226,7 @@ String ipToString(const IPAddress &ip){
 
 
 //  Write Mixpanel event output to Serial.
-void serialOutMpEvent(char *line0, char *line1){
+void serialOutMpEvent(const char *line0, const char *line1){
   Serial.println("LCD Output:");
   Serial.println(line0);
   Serial.println(line1);
@@ -265,13 +241,25 @@ void serialOutF(const __FlashStringHelper *line){
 //  type T: New catch-all Type
 template<typename T> void serialOutF1(const __FlashStringHelper *literal, T variable){
   Serial.print(literal);
-  Serial.print(F(": "));
+  Serial.print((": "));
   Serial.println(variable);
 }
 
 //  Write output to LCD. Low memory fix. No string is literal
 //  type T: New catch-all Type
-void lcdOut(char *line0, char *line0){
+void lcdOut(char *line0, char *line1){
+  LCD.clear();
+  delay(20);
+  LCD.setCursor(0, 0);
+  LCD.print(line0);
+  delay(20);
+  LCD.setCursor(0, 1);
+  LCD.print(line1);
+}
+
+//  Write output to LCD. Low memory fix. No string is literal
+//  type T: New catch-all Type
+void lcdOutMpEvent(const char *line0, const char *line1){
   LCD.clear();
   delay(20);
   LCD.setCursor(0, 0);
@@ -310,41 +298,17 @@ void lcdOutF2(const __FlashStringHelper *line0, const __FlashStringHelper *line1
 //  FRAM = free RAM
 //  CRUN = complete executions of loop. 0 index.
 void checkMemState(){
-  int freeRam = getFreeRam();
+  int freeRam = ESP.getFreeHeap();
   String strFreeRam = String(freeRam);
   String strRunCount = String(gRunCount);
 
-  //  Low memory. Reset Arduino
+  //  Low memory. Reset NodeMCU
   if(freeRam < FREE_RAM_THRESHOLD){
     serialOutF1(F("MEM CHK: RST RAM LOW. FRAM CRUN"), strFreeRam + " " + strRunCount);
     lcdOutF1(F("RST: FMEM; RUN"), strFreeRam + "; " + strRunCount);
-    wdtResetNow();  // Restart Arduino
+    ESP.restart();  // Restart NodeMCU
   }else{
     serialOutF1(F("MEM CHK: FRAM CRUN"), strFreeRam + " " + strRunCount);
   }
-}
-
-void wdtResetNow() {
-  wdt_enable(WDTO_2S);  //  Init WDT reset after 2s
-  while(1) {};  // Loiter here till timer expires
-}
-
-void wdtResetIfWaitShort(){
-  wdt_enable(WDTO_4S);
-}
-
-void wdtResetIfWaitLong(){
-  wdt_enable(WDTO_8S);
-}
-
-void wdtResetDisable(){
-  wdt_reset();
-  wdt_disable();
-}
-
-int getFreeRam(){
-  extern int __heap_start, *__brkval;
-  int v;
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 /*** End WDT & Reset  ***/
