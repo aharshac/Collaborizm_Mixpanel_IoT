@@ -53,4 +53,3 @@ db.eventSchema = new Schema({
 db.Event = mongoose.model('Event', db.eventSchema);
 
 module.exports = db;
-

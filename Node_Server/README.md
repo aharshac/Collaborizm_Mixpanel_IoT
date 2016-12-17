@@ -89,7 +89,7 @@ Human readable date and time. Not ISO 8601 time.
 
 &nbsp;
 
-## **Build Instructions**
+## **Build Instructions for PC**
 1. Install [Node.js](https://nodejs.org/)
 2. Get API keys from Mixpanel and MongoLab.
 3. Open Command Prompt or Terminal console.
@@ -99,3 +99,52 @@ Human readable date and time. Not ISO 8601 time.
 7. ``npm run dev``
 8. Note down Local IP address displayed in the console.
 9. To exit, press ``Ctrl + C`` and `y` in the console. Else, `nodemon` will crash.
+
+&nbsp;
+
+&nbsp;
+
+## **Raspberry Pi 2 Setup**
+For best results, flash latest ``Raspbian Jessie with Pixel`` image from [Raspberry Pi website](https://www.raspberrypi.org/downloads/raspbian/).
+
+&nbsp;
+
+### Hardware Setup
+![Circuit Diagram](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Arduino_UNO_Client/Circuit%20Diagram.png "Circuit Diagram")
+| Name           | Connects to                              |
+|----------------|------------------------------------------|
+| Pin 2 (5V)     | I2C LCD GND                              |
+| Pin 6 (GND)    | I2C LCD VCC                              |
+| Pin 3 (SDA1)   | I2C LCD SDA                              |
+| Pin 5 (SCL1)   | I2C LCD SCL                              |
+
+&nbsp;
+
+### Install Node.js 7.x
+Follow the instructions given by [Dave Johnson](http://thisdavej.com/upgrading-to-more-recent-versions-of-node-js-on-the-raspberry-pi/).
+
+&nbsp;
+
+### Enable I2C Interface
+There are two possible ways of doing this.
+* ``sudo raspi-config > Advanced Options``.
+* ``Applications Menu > Preferences > Raspberry Pi Configuration > Interfaces``
+
+&nbsp;
+
+### Install and Configure App
+1. Create directory ``/home/pi/mixpanel_iot_server``.
+2. Copy all individual JS source files to this directory.
+3. ``cd /home/pi/mixpanel_iot_server``
+4. ``sudo npm install -g nodemon``
+5. ``sudo npm install``
+6. ``sudo npm install lcdi2c``
+7. ``sudo chmod +x start.sh``
+8. Scan for I2C interface address of LCD using ``i2cdetect -y 1``.   
+9. Replace ``rpi.LCD_address`` in ``rpi.js`` with the output address.
+
+&nbsp;
+
+### Start App
+* To start from source directory, ``sudo ./start.sh``
+* To start from other directories, ``sudo /home/pi/mixpanel_iot_server/./start.sh``

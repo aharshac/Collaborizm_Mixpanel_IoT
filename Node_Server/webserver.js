@@ -18,8 +18,9 @@ server.app = express();
 //	Start web server
 server.start = function(callback){
 	server.server = server.app.listen(8970, function() {
-		console.log('Mixpanel IoT Node Server started @ ' + ip.address() + ':8970');
-		callback();
+		console.log('Mixpanel IoT Node Server started @ ' + ip.address() + ':' + server.server.address().port);
+		if(callback)
+			callback(ip.address(), server.server.address().port);
 	});
 };
 
@@ -138,48 +139,30 @@ server.app.get('/events', (req, res) => {
 //	Using formatted string looks like a bad idea
 //	So Json after all
 server.app.get('/events/arduino', (req, res) => {
-	var projection = 'name city country date timestamp';	// columns. col timestamp is required for sorting
-	var selection = mixpanel.required_events;			//	event name filter
-	var rows = 0;
-
-	var find = db.Event.find({}, projection);
-
-	if(selection.length > 0){
-		find.where('name').in(selection);
-	}
-
-	find.sort({'timestamp': -1});
-	find.limit(1);
-
-	var op = {};
-
-	find.exec(function(err, events) {
-		if (err){
+	mixpanel.getLatestStoredEventForLcd(function(err, event){
+		if(err){
 			res.send('{"Error":"' + err + '"}');
 			console.log("REST API Query Error @ " + config.getLogTime() + ": " + err);
 		}else{
-			if(events.length == 1){
-				var event = events[0];
+			var op = {};
 
-				var name = event.name;
-				var city = event.city;
-				var country = event.country;
-				var timestamp = event.timestamp;
+			var name = event.name;
+			var city = event.city;
+			var country = event.country;
+			var timestamp = event.timestamp;
+			var date = "";
 
-				if(moment(timestamp).isValid()){
-					date = moment(timestamp).format("HH:mm");
-				}
-
-				op = {
-					"0" : name + ", " + date,
-					"1"	: city + ", " + country
-				};
-
-				res.send(String.fromCharCode(30) + JSON.stringify(op));	//Content start: ASCII code for record separator
-			}else{
-				res.send("");	// empty
+			if(moment(timestamp).isValid()){
+				date = moment(timestamp).format("HH:mm");
 			}
-			console.log("REST API Query @ " + config.getLogTime() + ": Events/Arduino/Json\n" + JSON.stringify(op) + "\n");
+
+			op = {
+				"0" : name + ", " + date,
+				"1"	: city + ", " + country
+			};
+
+			res.send(String.fromCharCode(30) + JSON.stringify(op));	//Content start: ASCII code for record separator
+			console.log("REST API Query @ " + config.getLogTime() + ": Events/Arduino/Json\n" + JSON.stringify(op) + "\n")
 		}
 	});
 });

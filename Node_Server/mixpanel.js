@@ -135,4 +135,39 @@ mixpanel.getMpData = function(latest_only){
 };
 
 
+
+
+//	Gets the latest event (single) for LCD display
+mixpanel.getLatestStoredEventForLcd = function(callback){
+	var projection = 'name city country date timestamp';	// columns. col timestamp is required for sorting
+	var selection = mixpanel.required_events;			//	event name filter
+	var rows = 0;
+
+	var find = db.Event.find({}, projection);
+
+	if(selection.length > 0){
+		find.where('name').in(selection);
+	}
+
+	find.sort({'timestamp': -1});
+	find.limit(1);
+
+	find.exec(function(err, rows) {
+		if (err){
+			if(callback)
+				callback(err, null);
+		}else{
+			if(rows.length == 1){
+				var op = rows[0];
+
+				if(callback)
+					callback(false, op);
+			}else{
+				if(callback)
+					callback("Returned 0 rows.", null);
+			}
+		}
+	});
+};
+
 module.exports = mixpanel;
