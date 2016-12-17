@@ -110,7 +110,7 @@ For best results, flash latest ``Raspbian Jessie with Pixel`` image from [Raspbe
 &nbsp;
 
 ### Hardware Setup
-![Raspberry Pi 2 Pin Layout](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Node_Server/Raspberry%20Pi%20Pin%20Layout.jpg "Pin Layout")
+![Raspberry Pi 2 Pin Layout](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Node_Server/Raspberry%20Pi%202%20Pin%20Layout.jpg "Pin Layout")
 
 | Name           | Connects to                              |
 |----------------|------------------------------------------|
