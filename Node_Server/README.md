@@ -110,7 +110,8 @@ For best results, flash latest ``Raspbian Jessie with Pixel`` image from [Raspbe
 &nbsp;
 
 ### Hardware Setup
-![Circuit Diagram](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Arduino_UNO_Client/Circuit%20Diagram.png "Circuit Diagram")
+![Raspberry Pi 2 Pin Layout](https://github.com/aharshac/Collaborizm_Mixpanel_IoT/raw/master/Node_Server/Raspberry%20Pi%20Pin%20Layout.jpg "Pin Layout")
+
 | Name           | Connects to                              |
 |----------------|------------------------------------------|
 | Pin 2 (5V)     | I2C LCD GND                              |
